@@ -2,27 +2,53 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  transition: opacity 0.4s ease;
 }
 
-/* Hero Section */
+.blog-page.loading {
+  opacity: 0.7;
+}
+
+/* Hero Section with Parallax */
 .hero-section {
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("../assets/Cover.jpeg");
+  overflow: hidden;
+}
+
+.parallax-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../assets/Cover.jpeg");
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
+  transform: translateZ(0);
+  will-change: transform;
+  z-index: -1;
+  animation: subtle-zoom 20s infinite alternate ease-in-out;
+}
+
+@keyframes subtle-zoom {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
 }
 
 .hero-content {
   text-align: center;
   padding: 0 20px;
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
+  z-index: 1;
 }
 
 .hero-title {
@@ -30,6 +56,18 @@
   font-weight: bold;
   margin-bottom: 1.5rem;
   color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .hero-description {
@@ -39,6 +77,7 @@
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .explore-button {
@@ -49,12 +88,54 @@
   font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  margin-top: 3rem;
+
+  /* ✨ Glow animation */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.9);
+  }
+  100% {
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  }
+}
+
+.explore-button:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s;
+  z-index: -1;
 }
 
 .explore-button:hover {
-  background-color: #f0f0f0;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
+
+.explore-button:hover:before {
+  left: 100%;
+}
+
+.explore-button:active {
+  transform: translateY(-1px);
+}
+
 
 .scroll-indicator {
   position: absolute;
@@ -73,38 +154,115 @@
   border: none;
   color: white;
   cursor: pointer;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .scroll-button span {
   margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.scroll-icon {
+  animation: bounce 2s infinite;
 }
 
 @keyframes bounce {
   0%,
+  20%,
+  50%,
+  80%,
   100% {
-    transform: translateY(0) translateX(-50%);
+    transform: translateY(0);
   }
-  50% {
-    transform: translateY(-10px) translateX(-50%);
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
   }
 }
 
 /* Blog Section */
+/* .blog-section {
+  padding: 5rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  position: relative;
+}
+
+.blog-section:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../assets/Cover.jpeg");
+  opacity: 0.5;
+  z-index: 0;
+} */
+
 .blog-section {
   padding: 5rem 1rem;
-  background-color: #f8f8f8;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  animation: pastelRainbow 25s ease-in-out infinite;
+  background: linear-gradient(135deg, #ffd1dc, #ffe0ac); /* Initial fallback */
+}
+
+/* Faded glow overlay */
+.blog-section::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  z-index: 0;
+  pointer-events: none;
+  background: inherit;
+  filter: blur(60px) brightness(1.2);
+  opacity: 0.5;
+  animation: pastelRainbow 25s ease-in-out infinite;
+}
+@keyframes pastelRainbow {
+  0% {
+    background: linear-gradient(135deg, #ffd1dc, #ffe0ac);
+  }
+  20% {
+    background: linear-gradient(135deg, #ffe0ac, #fff9b0);
+  }
+  40% {
+    background: linear-gradient(135deg, #fff9b0, #c1f0c1);
+  }
+  60% {
+    background: linear-gradient(135deg, #c1f0c1, #c4f1f9);
+  }
+  80% {
+    background: linear-gradient(135deg, #c4f1f9, #e0bbf9);
+  }
+  100% {
+    background: linear-gradient(135deg, #e0bbf9, #ffd1dc);
+  }
 }
 
 .blog-section-container {
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .blog-section-title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
   text-align: center;
+  background: linear-gradient(90deg, #333 0%, #666 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
 .blog-section-description {
@@ -126,11 +284,51 @@
 /* Blog Post Wrapper */
 .blog-post-wrapper {
   padding-top: 2rem;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Footer Wrapper */
 .footer-wrapper {
   margin-top: auto;
+}
+
+/* Fade-in animation */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+/* Animation classes for scroll reveal */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.animate-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.blog-section .animate-on-scroll {
+  opacity: 1;
+  transform: none;
+}
+
+.hero-section .animate-on-scroll {
+  opacity: 1;
+  transform: none;
 }
 
 /* Responsive Design */
@@ -152,4 +350,17 @@
   .blog-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* Add a subtle gradient overlay to the page */
+.blog-page::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.03) 100%);
+  pointer-events: none;
+  z-index: 9999;
 }

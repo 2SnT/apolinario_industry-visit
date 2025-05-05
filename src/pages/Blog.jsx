@@ -1,10 +1,8 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Footer from "../components/Footer"
 import BlogCard from "../components/BlogCard"
 import BlogPost from "../components/BlogPost"
 import "./Blog.css"
-import { LuChevronDown } from "react-icons/lu";
-
 
 //images
 import day1cover from "../assets/ManilaTour.jpg"
@@ -63,6 +61,40 @@ import day8img1 from "../assets/NAIA1.jpg"
 import day8img2 from "../assets/ZAM.jpg"
 
 const Blog = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  // Initialize scroll animations
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.1,
+    }
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate-visible")
+        }
+      })
+    }
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions)
+
+    // Observe all elements with animate-on-scroll class
+    document.querySelectorAll(".animate-on-scroll").forEach((el) => {
+      observer.observe(el)
+    })
+
+    return () => {
+      document.querySelectorAll(".animate-on-scroll").forEach((el) => {
+        observer.unobserve(el)
+      })
+    }
+  }, [])
+
   // Blog data
   const blogData = [
     {
@@ -70,8 +102,7 @@ const Blog = () => {
       title: "Day 1: MANILA TOUR",
       date: "April 7, 2025",
       coverImage: day1cover,
-      shortDescription:
-        "Exploring the historical and cultural sites of Manila including Rizal Park and Fort Santiago.",
+      shortDescription: "Exploring the historical and cultural sites of Manila including Rizal Park and Fort Santiago.",
       description:
         "Our educational tour began with an exciting day exploring the historical and cultural landmarks of Manila. We visited several iconic sites that showcase the rich heritage of the Philippines' capital city.",
       places: [
@@ -95,7 +126,7 @@ const Blog = () => {
       date: "April 8, 2025",
       coverImage: day2cover,
       shortDescription:
-        "Visiting Subic Bay Exhibition and Convention Center, SBMA Seaport Department (Vessel Traffic Management System), SBMA Law Enforcement Department - Communication Branch, and Duty Free Shopping.",
+        "Visiting Subic Bay Exhibition and Convention Center, SBMA Seaport Department and Law Enforcement Department - Communication Branch, and Duty Free Shopping.",
       description:
         "Our second day took us to Subic Bay, a former US Naval Base transformed into a Freeport Zone. We had the opportunity to learn about maritime operations and security systems.",
       places: [
@@ -209,14 +240,14 @@ const Blog = () => {
       date: "April 12, 2025",
       coverImage: day6cover,
       shortDescription:
-        "Exploring Baguio City's attractions including Strawberry Farm, Chinese Bell Church, Philippine Military Academy, Mines View Park, Wright Park, Mansion House, and Burnham Park.",
+        "Exploring Baguio City's attractions including Strawberry Farm, Chinese Bell Church, Philippine Military Academy, Mansion House, and Mines View Park.",
       description:
         "Our sixth day took us to the summer capital of the Philippines, Baguio City. Known for its cool climate and beautiful landscapes, we explored various tourist attractions that showcase the city's natural beauty, cultural heritage, and historical significance.",
       places: [
         {
           name: "Strawberry Farm",
           description:
-            "We visited the famous La Trinidad Strawberry Farm where we had the unique experience of picking fresh strawberries. We learned about strawberry cultivation techniques adapted to the cool climate of the Cordillera region and how this agricultural activity contributes to the local economy.",
+            "We visited the famous La Trinidad Strawberry Farm, where although we weren’t able to pick strawberries, we enjoyed the beautiful scenery and learned about strawberry cultivation techniques adapted to the cool climate of the Cordillera region. We also gained insight into how this agricultural activity contributes to the local economy.",
           images: [day6img1, day6img2],
         },
         {
@@ -232,9 +263,9 @@ const Blog = () => {
           images: [day6img4, day6img5],
         },
         {
-          name: "Mansion",
+          name: "Mansion House",
           description:
-            "We stopped by the Mansion, where we admired its grand exterior and learned about its historical significance as the official summer residence of the Philippine president. Though we couldn’t go inside, the outside view gave us a sense of the mansion's architectural grandeur.",
+            "We stopped by the Mansion House, where we admired its grand exterior and learned about its historical significance as the official summer residence of the Philippine president. Though we couldn't go inside, the outside view gave us a sense of the mansion's architectural grandeur.",
           images: [day6img6],
         },
         {
@@ -264,7 +295,7 @@ const Blog = () => {
     },
     {
       id: 8,
-      title: "Day 8: Flight back to Zamboanga City",
+      title: "Day 8: Back to Zamboanga City",
       date: "April 14, 2025",
       coverImage: day8cover,
       shortDescription:
@@ -283,73 +314,78 @@ const Blog = () => {
   ]
 
   const [selectedPost, setSelectedPost] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
   const blogSectionRef = useRef(null)
 
   const handlePostClick = (postId) => {
+    setIsLoading(true)
     const post = blogData.find((post) => post.id === postId)
-    setSelectedPost(post)
-    window.scrollTo({ top: 0, behavior: "smooth" })
+
+    // Add a small delay for smooth transition
+    setTimeout(() => {
+      setSelectedPost(post)
+      window.scrollTo({ top: 0, behavior: "smooth" })
+      setIsLoading(false)
+    }, 400)
   }
 
-  // const handleBackClick = () => {
-  //   setSelectedPost(null)
-  // }
-
   const handleBackClick = () => {
-    setSelectedPost(null);
+    setIsLoading(true)
 
-    // Delay scroll until after state updates (and blog list is back in DOM)
+    // Add a small delay for smooth transition
     setTimeout(() => {
-      if (blogSectionRef.current) {
-        blogSectionRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 50); // Slight delay to ensure rendering
-  };
+      setSelectedPost(null)
+      setIsLoading(false)
 
+      // Wait for the state to update and DOM to render
+      setTimeout(() => {
+        // Scroll to the blog section after the DOM has updated
+        if (blogSectionRef.current) {
+          blogSectionRef.current.scrollIntoView({ behavior: "smooth" })
+        }
+      }, 100)
+    }, 300)
+  }
 
   const scrollToBlog = () => {
     blogSectionRef.current.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
-    <div className="blog-page">
+    <div className={`blog-page ${isLoading ? "loading" : ""}`}>
       {selectedPost ? (
-        <div className="blog-post-wrapper">
+        <div className="blog-post-wrapper fade-in">
           <BlogPost post={selectedPost} onBack={handleBackClick} />
         </div>
       ) : (
         <>
-          {/* Hero Section */}
+          {/* Hero Section with Parallax Effect */}
           <section id="home" className="hero-section">
-            <div className="hero-content">
+            <div className="parallax-bg"></div>
+            <div className="hero-content animate-on-scroll">
               <h1 className="hero-title">Welcome to My Educational Tour</h1>
               <p className="hero-description">
                 Join me on an 8-day journey exploring industries and cultural sites across the Philippines
               </p>
               <button onClick={scrollToBlog} className="explore-button">
-                Explore My Blog
+                <span>Explore My Blog</span>
               </button>
             </div>
-
-            {/* <div className="scroll-indicator">
-              <button onClick={scrollToBlog} className="scroll-button">
-                <span>Scroll Down</span>
-                <LuChevronDown size={24} />
-              </button>
-            </div> */}
           </section>
 
           {/* Blog Posts Section */}
           <section id="blog" ref={blogSectionRef} className="blog-section">
             <div className="blog-section-container">
-              <h2 className="blog-section-title">Educational Tour Blog</h2>
-              <p className="blog-section-description">
+              <h2 className="blog-section-title animate-on-scroll">Educational Tour Blog</h2>
+              <p className="blog-section-description animate-on-scroll">
                 Follow my 8-day journey through various industries and cultural sites in the Philippines
               </p>
 
               <div className="blog-grid">
-                {blogData.map((post) => (
-                  <BlogCard key={post.id} post={post} onClick={handlePostClick} />
+                {blogData.map((post, index) => (
+                  <div key={post.id} className="animate-on-scroll" style={{ animationDelay: `${index * 0.1}s` }}>
+                    <BlogCard post={post} onClick={handlePostClick} />
+                  </div>
                 ))}
               </div>
             </div>
